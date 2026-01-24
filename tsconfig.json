@@ -24,6 +24,15 @@
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false
-  }
+    "noPropertyAccessFromIndexSignature": false,
+
+    // Import Paths
+    "baseUrl": ".",
+    "paths": {
+      "@src/*": ["./src/*"],
+      "@types": ["./src/types.ts"],
+      "@tests/*": ["./tests/*"],
+    },
+  },
+  "include": ["src/**/*.ts", "tests/**/*.test.ts"],
 }

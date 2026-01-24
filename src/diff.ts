@@ -1,4 +1,4 @@
-import type * as T from "./types.ts";
+import type * as T from "./types";
 
 const isShallowEqual = (a: T.Prompt, b: T.Prompt): boolean =>
   JSON.stringify(a) === JSON.stringify(b);
