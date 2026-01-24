@@ -5,12 +5,12 @@ import diffTraces from "@src/diff";
 describe("[diffTraces()]: outcome diffs", () => {
   test("success → success is not a change", () => {
     const a = baseTrace({
-      trace_id: "a",
+      traceId: "a",
       outcome: { status: "success" },
     });
 
     const b = baseTrace({
-      trace_id: "b",
+      traceId: "b",
       outcome: { status: "success" },
     });
 
@@ -20,12 +20,12 @@ describe("[diffTraces()]: outcome diffs", () => {
 
   test("success → failure is a change", () => {
     const a = baseTrace({
-      trace_id: "a",
+      traceId: "a",
       outcome: { status: "success" },
     });
 
     const b = baseTrace({
-      trace_id: "b",
+      traceId: "b",
       outcome: {
         status: "failure",
         reason: "Tests failed",
@@ -40,7 +40,7 @@ describe("[diffTraces()]: outcome diffs", () => {
 
   test("failure → success is a change", () => {
     const a = baseTrace({
-      trace_id: "a",
+      traceId: "a",
       outcome: {
         status: "failure",
         reason: "Lint errors",
@@ -48,7 +48,7 @@ describe("[diffTraces()]: outcome diffs", () => {
     });
 
     const b = baseTrace({
-      trace_id: "b",
+      traceId: "b",
       outcome: { status: "success" },
     });
 
@@ -58,7 +58,7 @@ describe("[diffTraces()]: outcome diffs", () => {
 
   test("same status, different reason is a change", () => {
     const a = baseTrace({
-      trace_id: "a",
+      traceId: "a",
       outcome: {
         status: "failure",
         reason: "Timeout",
@@ -66,7 +66,7 @@ describe("[diffTraces()]: outcome diffs", () => {
     });
 
     const b = baseTrace({
-      trace_id: "b",
+      traceId: "b",
       outcome: {
         status: "failure",
         reason: "Permission denied",
@@ -79,7 +79,7 @@ describe("[diffTraces()]: outcome diffs", () => {
 
   test("identical outcome including reason is unchanged", () => {
     const a = baseTrace({
-      trace_id: "a",
+      traceId: "a",
       outcome: {
         status: "partial",
         reason: "Some tests skipped",
@@ -87,7 +87,7 @@ describe("[diffTraces()]: outcome diffs", () => {
     });
 
     const b = baseTrace({
-      trace_id: "b",
+      traceId: "b",
       outcome: {
         status: "partial",
         reason: "Some tests skipped",

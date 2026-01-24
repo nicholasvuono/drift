@@ -8,7 +8,7 @@ describe("[diffTraces()]: model & hyperparamater diff tests", () => {
       provider: "anthropic",
       model: "claude-3.5-sonnet",
       temperature: 0.2,
-      max_tokens: 4096,
+      maxTokens: 4096,
     };
 
     const a = baseTrace({ traceId: "a", model });
