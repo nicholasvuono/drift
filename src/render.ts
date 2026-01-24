@@ -94,3 +94,5 @@ const renderOutcome = (outcome: T.OutcomeDiff, lines: string[]) => {
 
   lines.push("");
 };
+
+export default renderDiffs;
