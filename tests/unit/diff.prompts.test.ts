@@ -2,7 +2,7 @@ import { expect, test, describe } from "bun:test";
 import { baseTrace } from "../fixtures";
 import diffTraces from "@src/diff";
 
-describe("[diffTraces()] – prompt diffs", () => {
+describe("[diffTraces()]: prompt diffs", () => {
   test("identical prompts are unchanged", () => {
     const prompts = [
       {

@@ -2,7 +2,7 @@ import { expect, test, describe } from "bun:test";
 import { baseTrace } from "../fixtures";
 import diffTraces from "@src/diff";
 
-describe("[diffTraces()] – outcome diffs", () => {
+describe("[diffTraces()]: outcome diffs", () => {
   test("success → success is not a change", () => {
     const a = baseTrace({
       trace_id: "a",
