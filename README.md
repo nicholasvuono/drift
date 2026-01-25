@@ -6,6 +6,10 @@
     <p>Think <i>git diff + CI</i> &mdash; but for agent behavior and impact</p>
 </div><br><br>
 
+## License
+Drift is source-available under the Business Source License (BSL).
+Commercial use requires explicit permission from the author.
+
 ## Why
 AI Agents are writing code, modifying repositories, running tools, helping to plan, making architectural decisions, testing and iterating, etc.
 
