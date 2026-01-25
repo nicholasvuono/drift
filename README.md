@@ -1,7 +1,7 @@
 <div align="center">
     <img src="images/logo_transparent.png" width="200" alt="drift"/><br>
     <h1><b>drift</b></h1><br>
-    <h3>The open-source tool for detecting behavior drift in AI agents</h3>
+    <h3>The developer framework for detecting behavior drift in AI agents</h3>
     <p>Drift helps teams compare, evaluate, and safely upgrade AI agents</p>
     <p>Think <i>git diff + CI</i> &mdash; but for agent behavior and impact</p>
 </div><br><br>
