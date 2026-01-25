@@ -33,6 +33,26 @@ const diffPrompts = (a: T.Prompts, b: T.Prompts): T.PromptDiff => {
   return { added, removed, unchanged };
 };
 
+// needed?
+const normalizeForSimilarity = (s: string): string[] =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+
+//TODO: potential refactor
+const jaccardSimilarity = (a: string, b: string): number => {
+  const aTokens = new Set(normalizeForSimilarity(a));
+  const bTokens = new Set(normalizeForSimilarity(b));
+  if (aTokens.size === 0 && bTokens.size === 0) return 1;
+  if (aTokens.size === 0 || bTokens.size === 0) return 0;
+  let intersection = 0;
+  for (const t of aTokens) if (bTokens.has(t)) intersection++;
+  const union = aTokens.size + bTokens.size - intersection;
+  return union === 0 ? 1 : intersection / union;
+};
+
 const mapPlanSteps = (ps: T.PlanSteps) => new Map(ps.map((s) => [s.index, s]));
 
 const diffPlanning = (a: T.PlanSteps, b: T.PlanSteps): T.PlanningDiff => {
@@ -51,14 +71,49 @@ const diffPlanning = (a: T.PlanSteps, b: T.PlanSteps): T.PlanningDiff => {
     if (!bMap.has(index)) removed.push(step);
   }
 
-  return { added, removed, unchanged };
+  const beforeText = a.map((s) => s.text).join("\n");
+  const afterText = b.map((s) => s.text).join("\n");
+  const similarity = jaccardSimilarity(beforeText, afterText);
+
+  return { added, removed, unchanged, similarity };
 };
 
 const summarizeTools = (toolCalls: T.ToolCalls): T.ToolUsageSummary => {
   const tools = new Set<string>();
+  const callsByTool: Record<string, number> = {};
   for (const call of toolCalls) tools.add(call.toolName);
-  return { totalCalls: toolCalls.length, uniqueTools: [...tools] };
+  return { totalCalls: toolCalls.length, uniqueTools: [...tools], callsByTool };
 };
+
+function computeToolDeltas(
+  before: T.ToolUsageSummary,
+  after: T.ToolUsageSummary,
+): T.ToolCallDeltas {
+  const allTools = new Set<string>([
+    ...Object.keys(before.callsByTool),
+    ...Object.keys(after.callsByTool),
+  ]);
+  const deltas: T.ToolCallDeltas = [];
+  for (const tool of allTools) {
+    const b = before.callsByTool[tool] ?? 0;
+    const a = after.callsByTool[tool] ?? 0;
+    const d = a - b;
+    if (d !== 0) {
+      deltas.push({
+        toolName: tool,
+        beforeCalls: b,
+        afterCalls: a,
+        delta: d,
+      });
+    }
+  }
+  deltas.sort(
+    (x, y) =>
+      Math.abs(y.delta) - Math.abs(x.delta) ||
+      x.toolName.localeCompare(y.toolName),
+  );
+  return deltas;
+}
 
 const filterTools = (a: T.ToolUsageSummary, b: T.ToolUsageSummary) =>
   a.uniqueTools.filter((t) => !b.uniqueTools.includes(t));
@@ -70,7 +125,9 @@ const diffTools = (aCalls: T.ToolCalls, bCalls: T.ToolCalls): T.ToolDiff => {
   const addedTools = filterTools(after, before);
   const removedTools = filterTools(before, after);
 
-  return { before, after, addedTools, removedTools };
+  const toolCallDeltas = computeToolDeltas(before, after);
+
+  return { before, after, addedTools, removedTools, toolCallDeltas };
 };
 
 const getChangedOutcomes = (a: T.Outcome, b: T.Outcome) =>

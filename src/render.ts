@@ -1,11 +1,18 @@
 import * as T from "./types";
 
+interface RenderOptions {
+  // color?: boolean // Maybe implement this later, I think rendering needs refactor in general
+  // Show per-tool call deltas (top N). Default 5.
+  toolDeltaLimit?: number;
+}
+
 const green = (s: string) => `\x1b[32m${s}\x1b[0m`;
 const red = (s: string) => `\x1b[31m${s}\x1b[0m`;
 const yellow = (s: string) => `\x1b[33m${s}\x1b[0m`;
 const bold = (s: string) => `\x1b[1m${s}\x1b[0m`;
 
-const renderDiffs = (diff: T.TraceDiff): string => {
+const renderDiffs = (diff: T.TraceDiff, options: RenderOptions): string => {
+  const limit = options.toolDeltaLimit ?? 50;
   const lines: string[] = [];
 
   lines.push(
@@ -19,7 +26,7 @@ const renderDiffs = (diff: T.TraceDiff): string => {
   renderModel(diff.model, lines);
   renderPrompts(diff.prompts, lines);
   renderPlanning(diff.planning, lines);
-  renderTools(diff.tools, lines);
+  renderTools(diff.tools, lines, limit);
   renderOutcome(diff.outcome, lines);
 
   return lines.join("\n");
@@ -57,10 +64,11 @@ const renderPlanning = (planning: T.PlanningDiff, lines: string[]) => {
   lines.push(`  ${green("+ Steps added:")}   ${planning.added.length}`);
   lines.push(`  ${red("- Steps removed:")} ${planning.removed.length}`);
   lines.push(`  = Unchanged:     ${planning.unchanged.length}`);
+  lines.push(`  Similarity:      ${planning.similarity.toFixed(2)}`);
   lines.push("");
 };
 
-const renderTools = (tools: T.ToolDiff, lines: string[]) => {
+const renderTools = (tools: T.ToolDiff, lines: string[], limit: number) => {
   lines.push(bold("TOOLS"));
   lines.push(`  Calls: ${tools.before.totalCalls} → ${tools.after.totalCalls}`);
 
@@ -72,6 +80,18 @@ const renderTools = (tools: T.ToolDiff, lines: string[]) => {
 
   if (tools.addedTools.length === 0 && tools.removedTools.length === 0)
     lines.push(`  = Tool set unchanged`);
+
+  if (tools.toolCallDeltas.length > 0) {
+    lines.push(
+      `  Deltas (top ${Math.min(limit, tools.toolCallDeltas.length)}):`,
+    );
+    for (const d of tools.toolCallDeltas.slice(0, limit)) {
+      const sign = d.delta > 0 ? red("+") : green("-");
+      lines.push(
+        `    ${d.toolName}: ${d.beforeCalls} → ${d.afterCalls} (${sign}${Math.abs(d.delta)})`,
+      );
+    }
+  }
 
   lines.push("");
 };
@@ -91,6 +111,12 @@ const renderOutcome = (outcome: T.OutcomeDiff, lines: string[]) => {
     lines.push(
       `    reason: "${outcome.before.reason ?? ""}" → "${outcome.after.reason ?? ""}"`,
     );
+
+  if (outcome.before.source || outcome.after.source) {
+    lines.push(
+      `    source: "${outcome.before.source ?? "unknown"}" → "${outcome.after.source ?? "unknown"}"`,
+    );
+  }
 
   lines.push("");
 };

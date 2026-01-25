@@ -74,7 +74,8 @@ describe("[CLI]: diff renderer (snapshot)", () => {
     });
 
     const diff = diffTraces(traceA, traceB);
-    const output = renderDiff(diff);
+    const output = renderDiff(diff, {});
+
     expect(output).toMatchSnapshot();
   });
 });

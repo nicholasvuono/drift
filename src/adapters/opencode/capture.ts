@@ -84,3 +84,5 @@ const runExport = async (
 
   return JSON.parse(stdout);
 };
+
+export { captureTrace, runExport };

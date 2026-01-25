@@ -72,7 +72,17 @@ interface AgentTrace {
 interface ToolUsageSummary {
   totalCalls: number;
   uniqueTools: string[];
+  callsByTool: Record<string, number>;
 }
+
+interface ToolCallDelta {
+  toolName: string;
+  beforeCalls: number;
+  afterCalls: number;
+  delta: number;
+}
+
+type ToolCallDeltas = ToolCallDelta[];
 
 type ModelConfKeys = Array<keyof ModelConf>;
 
@@ -93,6 +103,8 @@ interface PlanningDiff {
   added: PlanStep[];
   removed: PlanStep[];
   unchanged: PlanStep[];
+  /** Simple similarity score in [0,1] between concatenated plan texts. */
+  similarity: number;
 }
 
 interface ToolDiff {
@@ -100,6 +112,7 @@ interface ToolDiff {
   after: ToolUsageSummary;
   addedTools: string[];
   removedTools: string[];
+  toolCallDeltas: ToolCallDeltas;
 }
 
 interface OutcomeDiff {
@@ -134,6 +147,8 @@ export type {
   Outcome,
   AgentTrace,
   ToolUsageSummary,
+  ToolCallDelta,
+  ToolCallDeltas,
   ModelConfKeys,
   ModelDiff,
   PromptDiff,
