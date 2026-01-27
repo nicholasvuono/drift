@@ -5,6 +5,48 @@ const isoFromMs = (ms: number): string => new Date(ms).toISOString();
 
 const appendId = (prefix: string): string => `${prefix}_${crypto.randomUUID()}`;
 
+const truncate = (s: string, n = 120): string =>
+  s.length <= n ? s : `${s.slice(0, n - 1)}…`;
+
+const summarizeArgs = (
+  toolName: string,
+  args: Record<string, unknown>,
+): string => {
+  const pick = (...keys: string[]) => {
+    for (const k of keys) {
+      const v = (args as any)[k];
+      if (typeof v === "string" && v.trim()) return v.trim();
+    }
+    return undefined;
+  };
+
+  // Common fields across tool APIs
+  const path = pick("path", "file", "filePath", "file_path", "filename");
+  if (path) return truncate(path);
+
+  if (toolName === "bash" || toolName === "shell" || toolName === "cmd") {
+    const cmd = pick("command", "cmd", "script", "input");
+    if (cmd) return truncate(cmd);
+  }
+
+  // Fallback: compact JSON
+  try {
+    const raw = JSON.stringify(args);
+    return raw === "{}" ? "" : truncate(raw);
+  } catch {
+    return "";
+  }
+};
+
+const toolCallsToPlanning = (toolCalls: T.ToolCalls): T.PlanSteps =>
+  toolCalls.map((t, i) => {
+    const detail = summarizeArgs(t.toolName, t.args);
+    return {
+      index: i + 1,
+      text: detail ? `${t.toolName}: ${detail}` : t.toolName,
+    };
+  });
+
 // OpenCode to trace options
 interface Options {
   userPrompt?: string;
@@ -84,7 +126,7 @@ const eventsToAgentTrace = (events: Events, opts: Options): T.AgentTrace => {
     finishedAt: isoFromMs(finished),
     model,
     prompts,
-    planning: [],
+    planning: toolCallsToPlanning(toolCalls),
     toolCalls,
     outcome: {
       status: outcomeStatus,

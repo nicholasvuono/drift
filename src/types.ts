@@ -104,7 +104,7 @@ interface PlanningDiff {
   removed: PlanStep[];
   unchanged: PlanStep[];
   /** Simple similarity score in [0,1] between concatenated plan texts. */
-  similarity: number;
+  similarity: number | null;
 }
 
 interface ToolDiff {
@@ -124,6 +124,8 @@ interface OutcomeDiff {
 interface TraceDiff {
   traceIdA: UUID;
   traceIdB: UUID;
+  agentA?: string;
+  agentB?: string;
   model: ModelDiff;
   prompts: PromptDiff;
   planning: PlanningDiff;
