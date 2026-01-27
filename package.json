@@ -1,5 +1,6 @@
 {
-  "name": "kyuay",
+  "name": "drift",
+  "version": "v0.1.0",
   "module": "cli.ts",
   "type": "module",
   "private": true,
