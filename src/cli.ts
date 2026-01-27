@@ -3,10 +3,24 @@ import renderDiffs from "./render";
 import type { AgentTrace } from "./types";
 import { captureTrace } from "./adapters/opencode/capture";
 
-const usage = (exitCode = 1) => {
-  console.log(`drift — behavior drift testing for AI agents
+const renderBanner = () => {
+  const blue = "\x1b[38;5;39m"; // cyan/blue
+  const reset = "\x1b[0m";
 
-Usage:
+  console.log(`
+${blue}
+╭───────────────────────────────────────────────────────╮
+│                                                       │
+│                    🦋 drift                           │
+│                                                       │
+╰───────────────────────────────────────────────────────╯
+${reset}
+`);
+};
+
+const usage = (exitCode = 1) => {
+  renderBanner();
+  console.log(`Usage:
   drift <command> [options]
 
 Commands:
@@ -62,6 +76,7 @@ const cmd = args[0];
 
 //TODO: refactor this to be more robust
 const main = async () => {
+  renderBanner();
   if (cmd === "diff") {
     if (args.includes("-h") || args.includes("--help")) usage(0);
     const aPath = args[1];
