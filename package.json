@@ -1,7 +1,8 @@
 {
   "name": "drift",
   "version": "v0.1.0",
-  "module": "cli.ts",
+  "main": "src/cli.ts",
+  "module": "src/cli.ts",
   "type": "module",
   "private": true,
   "devDependencies": {
