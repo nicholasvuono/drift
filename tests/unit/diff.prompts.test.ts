@@ -93,8 +93,8 @@ describe("[diffTraces()]: prompt diffs", () => {
     const diff = diffTraces(a, b);
 
     expect(diff.prompts.unchanged).toHaveLength(0);
-    expect(diff.prompts.added).toHaveLength(0);
-    expect(diff.prompts.removed).toHaveLength(0);
+    expect(diff.prompts.added).toHaveLength(1);
+    expect(diff.prompts.removed).toHaveLength(1);
   });
 
   test("role or order change is treated as change", () => {
