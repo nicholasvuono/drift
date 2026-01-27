@@ -23,10 +23,10 @@ const renderDiffs = (diff: T.TraceDiff, options: RenderOptions): string => {
     : diff.model.after.model;
 
   lines.push(
-    bold("╭─ Agent Trace Diff ─────────────────────────────────────╮"),
-    `│ A: ${aLabel.padEnd(50)}│`,
-    `│ B: ${bLabel.padEnd(50)}│`,
-    bold("╰────────────────────────────────────────────────────────╯"),
+    bold("── Agent Diff ───────────────────────────────────────────"),
+    `A: ${aLabel}`,
+    `B: ${bLabel}`,
+    bold("─────────────────────────────────────────────────────────"),
     "",
   );
 

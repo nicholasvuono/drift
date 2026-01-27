@@ -2,6 +2,7 @@ import diffTraces from "./diff";
 import renderDiffs from "./render";
 import type { AgentTrace } from "./types";
 import { captureTrace } from "./adapters/opencode/capture";
+import terminalImage from "terminal-image";
 
 const usage = () => {
   console.log(`Usage:
@@ -20,8 +21,24 @@ if (args.length === 0) usage();
 
 const cmd = args[0];
 
+const renderBanner = () => {
+  const blue = "\x1b[38;5;39m"; // cyan/blue
+  const reset = "\x1b[0m";
+
+  console.log(`
+${blue}
+╭───────────────────────────────────────────────────────╮
+│                                                       │
+│                    🦋 drift                           │
+│                                                       │
+╰───────────────────────────────────────────────────────╯
+${reset}
+`);
+};
+
 //TODO: refactor this to be more robust
 const main = async () => {
+  renderBanner();
   if (cmd === "diff") {
     const aPath = args[1];
     const bPath = args[2];
@@ -65,7 +82,6 @@ const main = async () => {
     console.error(`Unknown agent: ${agent}`);
     process.exit(1);
   }
-
   usage();
 };
 
