@@ -7,7 +7,7 @@
 </div><br><br>
 
 ## Why
-AI Agents are writing code, modifying repositories, running tools, helping to plan, making architectural decisions, testing and iterating, etc.
+AI agents are writing code, modifying repositories, running tools, helping to plan, making architectural decisions, testing and iterating, etc.
 
 But today, there doesn't seem to be a standard way to answer the most important question:
 > "Is this new version of my agent actually better than the last?"
@@ -23,7 +23,7 @@ Drift exists to close that gap.
 
 ## What
 Drift currently implements a few key functionalities:
-- **Behvior Capturing**: capture the CLI behavior of an agent in an end to end capacity.
+- **Behavior Capturing**: capture the CLI behavior of an agent in an end to end capacity.
 - **Agent Behavior Diffing**: compare two agent runs and understand how the behavior has changed.
 - **Result Evaluation**: compares the actual effects of those two runs on a given codebase, file, directory, etc.
 
