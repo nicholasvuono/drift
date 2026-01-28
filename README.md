@@ -3,7 +3,7 @@
     <h1><b>drift</b></h1><br>
     <h3>The developer framework for detecting behavior drift in AI agents</h3>
     <p>Drift helps teams compare, evaluate, and safely upgrade AI agents</p>
-    <p>Think <i>git diff + CI</i> &mdash; but for agent behavior and impact</p>
+    <p>Think <i>git diff + E2E</i> &mdash; for agent behavior and impact</p>
 </div><br><br>
 
 ## Why
@@ -22,181 +22,175 @@ Drift exists to close that gap.
 <br><br>
 
 ## What
-Drift implements two key functionalities:
-1. **Agent Behavior Diffing**<br><br>
-Drift compares two agent runs and tells you how the agent's behavior changed:
-   - Models used (and hyperparameters)
-   - Prompts and system instructions
-   - Planning steps
-   - Tool usage (including per-tool call deltas)
-   - Final outcome (success/failure)
-     
-2. **Result Evaluation**<br><br>
-Drift compares the actual effects of those two runs:
-      - Git diff of code changes
-      - File-level and line-level changes
-      - Human scoring of improvement vs regression
-      - Optional HTML artifact for review
+Drift currently implements a few key functionalities:
+- **Behvior Capturing**: capture the CLI behavior of an agent in an end to end capacity.
+- **Agent Behavior Diffing**: compare two agent runs and understand how the behavior has changed.
+- **Result Evaluation**: compares the actual effects of those two runs on a given codebase, file, directory, etc.
 
-  This aims to give you:
-  > Behavior diff &mdash; Did the agent behave differently? <br>
-  > Results eval &mdash; Did the agent improve the system?
+This aims to give you:
+> Behavior diff &mdash; Did the agent behave differently? <br>
+> Results eval &mdash; Did the agent improve the system?
 
 <br>
 
-## Examples
-**Capture two agent runs**
-```bash
-drift capture \
-  --agent opencode \
-  --message "Fix the failing tests" \
-  --model openai/gpt-4.1 \
-  --out opencode-gpt4.1.json
+## Getting Started
 
+**MacOS / Linux**
+1. Download the appropriate binary from the GitHub Releases page.
+2. `chmod +x drift`
+3. `sudo mv drift /usr/local/bin/`
+4. `drift --help`
+
+**Windows**
+1. Download `drift-windows-x64.exe` from the GitHub Releases page.
+2. (Recommended) Rename it to `drift.exe`.
+3. Either:
+   - double-click it, or
+   - add the folder containing `drift.exe` to your `PATH`.
+5. Verify in PowerShell:
+   - `drift --help`
+
+**Have an agent(s) downloaded**: OpenCode (recommended)
+
+**NOTE:** We are expanding support for additional agents. A common output schema is planned to enable direct integration for new agents and to allow existing agents to contribute a lightweight adapter for their specific runtime.
+
+That’s it. You can now run drift from anywhere.
+
+<br>
+
+## Example
+**Capture agent A's behavior**
+```
 drift capture \
   --agent opencode \
-  --message "Fix the failing tests" \
-  --model anthropic/claude-3.5-sonnet \
-  --out opencode-sonnet3.5.json
+  --message "Create a new text file that says 'hello world' at this location: ./hello_world.txt" \
+  --model opencode/big-pickle \
+  --out opencode-big-pickle.json
 ```
 
-**Diff the agent behavior**
-```bash
-drift diff opencode-gpt4.1.json opencode-sonnet3.5.json
+**Capture agent B's behavior**
+```
+drift capture \
+  --agent opencode \
+  --message "Create a new HTML file that prints 'hello world' in the console using a javascript function at this location: ./hello_world.html, then edit it to print 'peace' instead, and then delete it" \
+  --model opencode/gpt-5-nano \
+  --out opencode-gpt5-nano.json
+```
+
+**Diff the agent behaviors**
+```
+drift diff opencode-big-pickle.json opencode-gpt5-nano.json
 ```
 
 **Output**
-```bash
-╭─ Agent Trace Diff ─────────────────────────────────────╮
-│ A: run-2026-01-24-a                                    │
-│ B: run-2026-01-24-b                                    │
-╰────────────────────────────────────────────────────────╯
+```
+╭───────────────────────────────────────────────────────╮
+│                                                       │
+│                    🦋 drift                           │
+│                                                       │
+╰───────────────────────────────────────────────────────╯
+
+
+── Agent Diff ───────────────────────────────────────────
+A: big-pickle
+B: gpt-5-nano
+─────────────────────────────────────────────────────────
 
 MODEL
-  ~ Model changed
-    provider: anthropic → openai
-    model: claude-3.5-sonnet → gpt-4.1
-    temperature: 0.2 → 0.7
+  big-pickle → gpt-5-nano
+  ~ Changed
 
 PROMPTS
+  big-pickle: Create a new text file that says 'hello world' at this location: ./hello_world.txt
+  gpt-5-nano: Create a new HTML file that prints 'hello world' in the console using a javascript function at this …
   + Added:   1
   - Removed: 1
-  = Same:    2
+  = Same:    0
 
 PLANNING
-  + Steps added:   0
+  big-pickle:
+     - write: ./hello_world.txt
+  gpt-5-nano:
+     - write: ./hello_world.html
+     - read: ./hello_world.html
+     - edit: ./hello_world.html
+     - read: ./hello_world.html
+     - write: ./hello_world.html
+     - read: ./hello_world.html
+     - write: ./hello_world.html
+     - read: ./hello_world.html
+     - bash: rm "./hello_world.html" && echo Deleted || echo Delete failed
+  + Steps added:   9
   - Steps removed: 1
-  = Unchanged:     2
-  Similarity:      0.67
+  = Unchanged:     0
+  Similarity:      0.31
 
 TOOLS
-  Calls: 5 → 9
-  + Added tools:   search_repo
-  = Tool set unchanged
-  Deltas (top 3):
-    search_repo: 0 → 4 (+4)
-    read_file:   3 → 2 (-1)
-    write_file:  2 → 3 (+1)
+  big-pickle (unique tools):
+     - write
+  gpt-5-nano (unique tools):
+     - write
+     - read
+     - edit
+     - bash
+  Calls: 1 → 9
+  + Added tools:   read, edit, bash
 
 OUTCOME
-  ✗ Changed
-    success → failure
-    reason: "All tests passing" → "Lint errors in auth module"
-    source: "process_exit" → "process_exit"
-```
-
-**Evaluate Actual Effects** 🚧 Under Construction 🚧
-```bash
-drift eval \
-  --baseline ./repo_before \
-  --candidate ./repo_after \
-  --trace-a run-a.json \
-  --trace-b run-b.json \
-  --out report.html
-```
-**Open HTML Report** 🚧 Under Construction 🚧<br>
-- agent diff
-- git diff
-- manual eval - score the result fo historical archive:
-    - much worse -> much better
-    - would you ship this?
- 
-<br>
-
-## Architecture (High Level)
-```
-Agent Run A  ─┐
-              ├─> AgentTrace ─┐
-Agent Run B  ─┘               │
-                              ├─> TraceDiff
-Code Before ────────────────┐ │
-                             ├─> ResultEvaluation ──> HTML / JSON / CI
-Code After  ────────────────┘ │
+  big-pickle: ✓ Successful (source: process_exit)
+  gpt-5-nano: ✓ Successful (source: process_exit)
+  Result: ✓ Unchanged
 ```
 
 <br>
 
-## Roadmap
-**Features**
-| Feature | Implmented | Status |
-|---|---|---|
-| Agent trace capture | ✅ | Initial implementation complete |
-| Deterministic diffing | ✅ | Initial implementation complete |
-| CLI + JSON output | ✅ | MVP state complete |
-| Snapshot + unit + golden tests | ✅ | Happy paths complete |
-| OpenCode adapter | ✅ | Initial implementation complete |
-| Additional agent adapters | ❌ | To-do |
-| Historical regression datasets | ❌ | To-do |
-| HTML reports | 👷 | In development |
-| Git-based result diffing | ❌ | To-do |
-| Human scoring loop | ❌ | To-do |
-| CI gating for agent upgrades | ❌ | ??? |
-| Session diffing (interactive agents) | ❌ | ??? |
-| Internal reward modeling | ❌ | ??? |
+## Commands
+| Command | Description |
+|--------|-------------|
+| `drift capture` | Run an agent and capture its behavior into a trace JSON file |
+| `drift diff` | Compare two agent traces and highlight behavioral differences |
+| `drift help` | Show help and usage information |
+| `drift version` | Print the installed Drift version |
 
 <br>
 
-## Supported Agent Adapters
-| Agent | Implemented |
-|---|---|
-| OpenCode | ✅ | 
-| ClaudeCode | ❌ |
-| Gemini CLI | ❌ |
-| Copilot Agent Mode | ❌ |
-| Goose | ❌ |
-
-**NOTE:** We are working on adapters for more agents as quickly as we can. If there are any others you like supported please open an issue and it can be discussed there.
-
-<br>
-
-## Why This Matters
-As agents become more autonomous, teams need:
-  - a way to detect regressions
-  - a way to compare versions
-  - a way to trust upgrades
-  - a way to build internal benchmarks
-    
-Right now, none of that exists in a principled way.
+##Command Options
+| Option | Description |
+|--------|-------------|
+| `--agent <name>` | Agent runtime to use (e.g. `opencode`) |
+| `--model <provider/model>` | Model identifier passed to the agent |
+| `--message "<prompt>"` | Prompt or task given to the agent |
+| `--out <file>` | Output path for the captured trace (default: `trace.json`) |
+| `--json` | Output diff results as JSON instead of formatted text |
+| `-h, --help` | Show help for a command |
+| `-v, --version` | Show Drift version |
 
 <br>
 
-## What Drift Is Built For
-  - “Should we upgrade our agent?”
-  - “Did this prompt change help or hurt?”
-  - “Is GPT-4.1 actually better than Claude here?”
-  - “Why did tool usage explode after this change?”
-  - “Can we safely ship this agent to production?”
+## Design Principles
 
-<br>
+As AI agents become more autonomous, teams need a principled way to:
+- detect behavior regressions
+- compare versions and configurations
+- trust upgrades before shipping
+- build internal benchmarks
 
-## What Drift Is Not
-Drift is not trying to do:
-  - Fully automatic scoring
-  - LLM-based judging
-  - One-size-fits-all metrics
-  - Replacing human review
+Drift is built to answer practical questions like:
+- Should we upgrade this agent?
+- Did this prompt change help or hurt?
+- Is model A actually better than model B for this workflow?
+- Why did tool usage change after this update?
 
-Drift is about making human judgment scalable and structured.
+Today, Drift focuses on **behavioral diffs and human-in-the-loop evaluation**.
+It intentionally avoids opaque, one-size-fits-all scoring systems.
+
+That said, Drift is designed to evolve toward **programmatic and JSON-based assertions**
+where they make sense — enabling teams to:
+- codify expected behaviors
+- gate changes in CI
+- mix automated checks with structured human review
+
+The goal is not to replace human judgment, but to make it **repeatable, testable, and scalable**.
 
 <br>
 
@@ -206,7 +200,8 @@ Drift is built around a simple principle:
 
 <br>
 
-## License
-Drift is source-available under the Business Source License (BSL).
-Commercial use requires explicit permission from the author.
+## Roadmap
+Please refer to ROADMAP.md
 
+## Contributions
+Please refer to CONTRIBUTING.md
