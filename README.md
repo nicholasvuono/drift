@@ -154,7 +154,7 @@ OUTCOME
 
 <br>
 
-##Command Options
+## Command Options
 | Option | Description |
 |--------|-------------|
 | `--agent <name>` | Agent runtime to use (e.g. `opencode`) |
