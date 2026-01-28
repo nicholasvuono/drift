@@ -154,19 +154,6 @@ OUTCOME
 
 <br>
 
-## Command Options
-| Option | Description |
-|--------|-------------|
-| `--agent <name>` | Agent runtime to use (e.g. `opencode`) |
-| `--model <provider/model>` | Model identifier passed to the agent |
-| `--message "<prompt>"` | Prompt or task given to the agent |
-| `--out <file>` | Output path for the captured trace (default: `trace.json`) |
-| `--json` | Output diff results as JSON instead of formatted text |
-| `-h, --help` | Show help for a command |
-| `-v, --version` | Show Drift version |
-
-<br>
-
 ## Design Principles
 
 As AI agents become more autonomous, teams need a principled way to:
