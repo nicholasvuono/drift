@@ -45,15 +45,7 @@ Examples:
   process.exit(exitCode);
 };
 
-const version = async (): Promise<string> => {
-  try {
-    const pkgUrl = new URL("../package.json", import.meta.url);
-    const pkg = (await Bun.file(pkgUrl).json()) as { version?: string };
-    return pkg.version ?? "0.0.0";
-  } catch {
-    return "0.0.0";
-  }
-};
+const version = process.env.VERSION;
 
 const args = Bun.argv.slice(2);
 if (args.length === 0) usage(1);
@@ -68,7 +60,7 @@ if (
   args.includes("--version") ||
   args[0] === "version"
 ) {
-  console.log(await version());
+  console.log(version);
   process.exit(0);
 }
 
