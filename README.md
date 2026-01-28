@@ -172,7 +172,7 @@ Today, Drift focuses on **behavioral diffs and human-in-the-loop evaluation**.
 It intentionally avoids opaque, one-size-fits-all scoring systems.
 
 That said, Drift is designed to evolve toward **programmatic and JSON-based assertions**
-where they make sense — enabling teams to:
+where they make sense, enabling teams to:
 - codify expected behaviors
 - gate changes in CI
 - mix automated checks with structured human review
