@@ -6,7 +6,7 @@
 </div><br><br>
 
 ## Why
-AI Agents are writing code, modifying repositories, running tools, helping to plan, making architectural decisions, testing and iterating, etc.
+AI agents are writing code, modifying repositories, running tools, helping to plan, making architectural decisions, testing and iterating, etc.
 
 But today, there doesn't seem to be a standard way to answer the most important question:
 > "Is this new version of my agent actually better than the last?"
@@ -22,7 +22,7 @@ Drift exists to close that gap.
 
 ## What
 Drift currently implements a few key functionalities:
-- **Behvior Capturing**: capture the CLI behavior of an agent in an end to end capacity.
+- **Behavior Capturing**: capture the CLI behavior of an agent in an end to end capacity.
 - **Agent Behavior Diffing**: compare two agent runs and understand how the behavior has changed.
 - **Result Evaluation**: compares the actual effects of those two runs on a given codebase, file, directory, etc.
 
@@ -153,19 +153,6 @@ OUTCOME
 
 <br>
 
-##Command Options
-| Option | Description |
-|--------|-------------|
-| `--agent <name>` | Agent runtime to use (e.g. `opencode`) |
-| `--model <provider/model>` | Model identifier passed to the agent |
-| `--message "<prompt>"` | Prompt or task given to the agent |
-| `--out <file>` | Output path for the captured trace (default: `trace.json`) |
-| `--json` | Output diff results as JSON instead of formatted text |
-| `-h, --help` | Show help for a command |
-| `-v, --version` | Show Drift version |
-
-<br>
-
 ## Design Principles
 
 As AI agents become more autonomous, teams need a principled way to:
@@ -184,7 +171,7 @@ Today, Drift focuses on **behavioral diffs and human-in-the-loop evaluation**.
 It intentionally avoids opaque, one-size-fits-all scoring systems.
 
 That said, Drift is designed to evolve toward **programmatic and JSON-based assertions**
-where they make sense — enabling teams to:
+where they make sense, enabling teams to:
 - codify expected behaviors
 - gate changes in CI
 - mix automated checks with structured human review
